@@ -17,12 +17,20 @@ with open('../primary_results.csv', 'r') as pr_f:
     lines = pr_f.readlines()
     with open('../clinton_train.csv', 'w') as ct_f:
         with open('../trump_train.csv', 'w') as tt_f:
-            for line in lines:
-                l = line.strip('\n').split(',')
-                if(l[5] == 'Hillary Clinton'):
-                    ct_f.write(l[0] + ',' + l[2] + ',' + l[3] + ',' + l[6] + ',' + l[7] + '\n')
-                elif(l[5] == 'Donald Trump'):
-                    tt_f.write(l[0] + ',' + l[2] + ',' + l[3] + ',' + l[6] + ',' + l[7] + '\n')
+            with open('../clinton_test.csv', 'w') as ctest_f:
+                with open('../trump_test.csv', 'w') as ttest_f:
+                    for line in lines:
+                        l = line.strip('\n').split(',')
+                        if(l[0] in random_states):
+                            if(l[5] == 'Hillary Clinton'):
+                                ctest_f.write(l[0] + ',' + l[2] + ',' + l[3] + ',' + l[6] + ',' + l[7] + '\n')
+                            elif(l[5] == 'Donald Trump'):
+                                ttest_f.write(l[0] + ',' + l[2] + ',' + l[3] + ',' + l[6] + ',' + l[7] + '\n')
+                        if(l[0] not in random_states):
+                            if(l[5] == 'Hillary Clinton'):
+                                ct_f.write(l[0] + ',' + l[2] + ',' + l[3] + ',' + l[6] + ',' + l[7] + '\n')
+                            elif(l[5] == 'Donald Trump'):
+                                tt_f.write(l[0] + ',' + l[2] + ',' + l[3] + ',' + l[6] + ',' + l[7] + '\n')
 
   
         
