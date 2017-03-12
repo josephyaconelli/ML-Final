@@ -2,8 +2,10 @@ import sys
 import os
 
 
-with open("temp_republican_primary_results.csv", "r") as f:
-    with open("mod_republican_primary_results.csv", "w") as g:
+republican_results = sys.argv[1]
+print('test')
+with open(republican_results, "r") as f:
+    with open("republican_primary_results.csv", "w") as g:
         line = f.readline()
         l = line.split(',')
         state = l[0]
