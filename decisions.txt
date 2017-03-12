@@ -1,0 +1,4 @@
+-Pulling a single state from each region. We believe there is distinguishable voting records by region
+So we want to guarantee we are testing states from a variety of regions. 
+We did python random choice generation for the 10 regions of the standard US regions. 
+Those states were put into their own file, and all the other states were in the train csv file. 

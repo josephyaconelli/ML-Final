@@ -35,4 +35,9 @@ def main(argv):
     ytemp.append(instance.pop(len(varnames)))
   x = np.array(train)
   y = np.array(ytemp)
+  print train[2]
+  print y[0]
+  print y[1]
+  print y[2]
+  print y[3]
   reg = linear_model.Ridge (alpha = .5)
