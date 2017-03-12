@@ -1,0 +1,102 @@
+PST045214
+"Population
+PST040210
+"Population
+PST120214
+"Population
+POP010210
+"Population
+AGE135214
+"Persons under 5 years
+AGE295214
+"Persons under 18 years
+AGE775214
+"Persons 65 years and over
+SEX255214
+"Female persons
+RHI125214
+"White alone
+RHI225214
+"Black or African American alone
+RHI325214
+"American Indian and Alaska Native alone
+RHI425214
+"Asian alone
+RHI525214
+"Native Hawaiian and Other Pacific Islander alone
+RHI625214
+"Two or More Races
+RHI725214
+"Hispanic or Latino
+RHI825214
+"White alone
+POP715213
+"Living in same house 1 year & over
+POP645213
+"Foreign born persons
+POP815213
+"Language other than English spoken at home
+EDU635213
+"High school graduate or higher
+EDU685213
+"Bachelor's degree or higher
+VET605213
+"Veterans
+LFE305213
+"Mean travel time to work (minutes)
+HSG010214
+"Housing units
+HSG445213
+"Homeownership rate
+HSG096213
+"Housing units in multi-unit structures
+HSG495213
+"Median value of owner-occupied housing units
+HSD410213
+"Households
+HSD310213
+"Persons per household
+INC910213
+"Per capita money income in past 12 months (2013 dollars)
+INC110213
+"Median household income
+PVY020213
+"Persons below poverty level
+BZA010213
+"Private nonfarm establishments
+BZA110213
+"Private nonfarm employment
+BZA115213
+"Private nonfarm employment
+NES010213
+"Nonemployer establishments
+SBO001207
+"Total number of firms
+SBO315207
+"Black-owned firms
+SBO115207
+"American Indian- and Alaska Native-owned firms
+SBO215207
+"Asian-owned firms
+SBO515207
+"Native Hawaiian- and Other Pacific Islander-owned firms
+SBO415207
+"Hispanic-owned firms
+SBO015207
+"Women-owned firms
+MAN450207
+"Manufacturers shipments
+WTN220207
+"Merchant wholesaler sales
+RTN130207
+"Retail sales
+RTN131207
+"Retail sales per capita
+AFN120207
+"Accommodation and food services sales
+BPS030214
+"Building permits
+LND110210
+"Land area in square miles
+POP060210
+"Population per square mile
