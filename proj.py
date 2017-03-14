@@ -60,46 +60,71 @@ def test_results(filename):
     testY.append(example[4])
   return [(x,y) for x,y in zip(testX,testY)]
 
-def train_model(data):
+def separate_data(data):
   # Separating data into list of feature vectors and target vector.
   X = []
   y = []
   for r in data:
-      print(r)
+      #print(r)
       x = r[0]
       if(not x):
           continue
       if(len(x) != 51):
           print('This datapoint is a different length, check before proceeding.')
           sys.exit()
+      # Only look at 10 features for now. 
+      x = x[:4]
       X.append(x)
       y.append(r[1])
-      #if(len(X) == 100):
-      #    break
   X = np.array(X)
-  # Defining model with linear kernel.
-  svr_rbf = SVR(kernel='rbf', C=1e2, gamma=0.1)
-  svr_lin = SVR(kernel='linear', C=1e3)
-  svr_poly = SVR(kernel='poly', C=1e3, degree=51)
-  print(np.shape(X))
-  print(X)
-  svr_rbf_clf = svr_rbf.fit(X,y)
-  #svr_lin_clf = svr_lin.fit(X,y)
-  print('Classifier training complete')
-  #return svr_lin_clf
-  return svr_rbf_clf
+  y = np.array(y)
+  return X,y
+  
+def explore_data(X,y):
+  # We will use our judgement to do some pre-selection for important features.
+  # PST040214: Population, 2014 estimate
+  # PSTPersons 65 years and over, percent
+  print(' ')
 
-def test_model(test_data, svr_rbf_clf):
-  print(test_data)
-  x = []
-  for td in test_data:
-    if(not td[0]):
-      continue # This sample is missing (most likely because there was not a county to go with the primary result).
-    x.append(td[0])
-  x = np.array(x)
-  p = svr_rbf_clf.predict(x)
-  #print('Truth: ' + str(y) + ', prediction: ' + str(p))
-  print(p)
+def train_model(X, y):
+  # Defining model with linear kernel.
+  svr_rbf = SVR(kernel='rbf', C=1e3, gamma='auto', epsilon=0.1, verbose=True)
+  svr_lin = SVR(kernel='linear', C=1e3, epsilon=0.1, verbose=True, cache_size=7000)
+  svr_poly = SVR(kernel='poly', C=1e1, degree=10, max_iter=1000000, epsilon=0.4, verbose=True)
+  #print(np.shape(X))
+  #print(X)
+  svr_rbf_model = svr_rbf.fit(X,y)
+  svr_lin_model = svr_lin.fit(X,y)
+  svr_poly_model = svr_poly.fit(X,y)
+  rbf_preds = svr_rbf_model.predict(X)
+  lin_preds = svr_lin_model.predict(X)
+  poly_preds = svr_poly_model.predict(X)
+  # View how well the model can predict the training data as a sanity check.
+  print(rbf_preds)
+  print(lin_preds)
+  print(poly_preds)
+  lw = 1
+  plt.scatter(range(0,len(y)),y, color='red', label='data')
+  plt.hold('on')
+  plt.plot(range(0,len(y)),rbf_preds, color='blue', lw=lw, label='RBF model')
+  plt.plot(range(0,len(y)),lin_preds, color='green', lw=lw, label='Linear model')
+  plt.xlabel('sample index')
+  plt.ylabel('target')
+  plt.title('Primary Training Data Support Vector Regression')
+  plt.legend()
+  plt.show()
+  print('Classifier training complete')
+  return svr_rbf_model, svr_lin_model, svr_poly_model
+
+def test_model(X, y, model):
+  p = model.predict(X)
+  for i in range(len(y)):
+    print('Truth: ' + str(y[i]) + ', prediction: ' + str(p[i]))
+  return p
+
+def view_results(results):
+   lw = 2
+   plt.hold('on')
  
 def main(argv):
   if (len(argv) != 5):
@@ -111,15 +136,21 @@ def main(argv):
   train_data = train_results(argv[0])
   test_data = test_results(argv[1])
   #read_results(argv[1], testX, testY)
-  #print trainX[0]
-  #print trainY[0]
-  #print(factdict)
-  #print(paramdict)
-  #print(train_data)
-  svr_rbf_clf = train_model(train_data)
-  test_model(test_data, svr_rbf_clf)
-  
-  reg = linear_model.Ridge (alpha = .5)
+
+  # Separate X matrix and y vector for training and test data.
+  xTrain, yTrain = separate_data(train_data)
+  xTest, yTest = separate_data(test_data)
+
+  # Exploration section, plot various features against the to see what type of
+  # feature scaling is appropriate.
+  #explore_data(xTrain, yTrain)
+ 
+  svr_rbf_model, svr_lin_model, svr_poly_model = train_model(xTrain,yTrain)
+  results = test_model(xTest, yTest, svr_rbf_model)
+  results = test_model(xTest, yTest, svr_lin_model)
+  results = test_model(xTest, yTest, svr_poly_model)
+  view_results(results)
+  #reg = linear_model.Ridge (alpha = .5)
 
 
 
