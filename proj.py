@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 from sklearn import linear_model
 from sklearn.svm import SVR
 
+
 paramdict = {} #dictionary so we can print actual parameter titles, not abbreviations
 factdict = {} #keeps track of parameters associated with a county ID number
 trainX = [] #list of X vectors of the training data
@@ -79,6 +80,19 @@ def separate_data(data):
   X = np.array(X)
   y = np.array(y)
   return X,y
+
+def preprocess(X,y):
+  maxs = [0.0] * len(X[0])
+  mins = [0.0] * len(X[0])
+  for i in range(len(X)):
+    for j in range(len(X[i])):
+      maxs[j] = max(maxs[j], X[i][j])
+      mins[j] = min(mins[j], X[i][j])
+  for i in range(len(X)):
+    for j in range(len(X[i])):
+      X[i][j] = (X[i][j] - mins[j])/(maxs[j] - mins[j])
+  #return X, y
+    
   
 def explore_data(X,y):
   # We will use our judgement to do some pre-selection for important features.
@@ -88,14 +102,17 @@ def explore_data(X,y):
 
 def train_model(X, y):
   # Defining model with linear kernel.
+  logreg = linear_model.LogisticRegression(C=1e10, verbose=True)
   svr_rbf = SVR(kernel='rbf', C=1e3, gamma='auto', epsilon=0.1, verbose=True)
-  svr_lin = SVR(kernel='linear', C=1e3, epsilon=0.1, verbose=True, cache_size=7000)
+  svr_lin = SVR(kernel='linear', C=1e3, epsilon=0.1, verbose=True, cache_size=7000, max_iter=10000)
   svr_poly = SVR(kernel='poly', C=1e1, degree=10, max_iter=1000000, epsilon=0.4, verbose=True)
   #print(np.shape(X))
   #print(X)
+  logreg_model = logreg.fit(X,y)
   svr_rbf_model = svr_rbf.fit(X,y)
   svr_lin_model = svr_lin.fit(X,y)
   svr_poly_model = svr_poly.fit(X,y)
+  logreg_preds = logreg_model.predict(X)
   rbf_preds = svr_rbf_model.predict(X)
   lin_preds = svr_lin_model.predict(X)
   poly_preds = svr_poly_model.predict(X)
@@ -114,7 +131,7 @@ def train_model(X, y):
   plt.legend()
   plt.show()
   print('Classifier training complete')
-  return svr_rbf_model, svr_lin_model, svr_poly_model
+  return logreg_model, svr_rbf_model, svr_lin_model, svr_poly_model
 
 def test_model(X, y, model):
   p = model.predict(X)
@@ -140,15 +157,18 @@ def main(argv):
   # Separate X matrix and y vector for training and test data.
   xTrain, yTrain = separate_data(train_data)
   xTest, yTest = separate_data(test_data)
+  preprocess(xTrain,yTrain)
+  
 
   # Exploration section, plot various features against the to see what type of
   # feature scaling is appropriate.
   #explore_data(xTrain, yTrain)
  
-  svr_rbf_model, svr_lin_model, svr_poly_model = train_model(xTrain,yTrain)
-  results = test_model(xTest, yTest, svr_rbf_model)
-  results = test_model(xTest, yTest, svr_lin_model)
-  results = test_model(xTest, yTest, svr_poly_model)
+  logreg_model, svr_rbf_model, svr_lin_model, svr_poly_model = train_model(xTrain,yTrain)
+  #results = test_model(xTest, yTest, svr_rbf_model)
+  #results = test_model(xTest, yTest, svr_lin_model)
+  #results = test_model(xTest, yTest, svr_poly_model)
+  results = test_model(xTest,yTest, logreg_model)
   view_results(results)
   #reg = linear_model.Ridge (alpha = .5)
 
