@@ -4,6 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from sklearn import linear_model
 from sklearn.svm import SVR
+from sklearn.linear_model import Ridge
 
 
 paramdict = {} #dictionary so we can print actual parameter titles, not abbreviations
@@ -74,7 +75,9 @@ def separate_data(data):
           print('This datapoint is a different length, check before proceeding.')
           sys.exit()
       # Only look at 10 features for now. 
-      x = x[:4]
+      # Using 
+      features_chosen = [0,6,7,8,9,10,15,18,20,21,22,24,25,29,30,31,32,47,49,50]
+      x = [x[i] for i in features_chosen]
       X.append(x)
       y.append(r[1])
   X = np.array(X)
@@ -102,16 +105,36 @@ def explore_data(X,y):
 
 def train_model(X, y):
   # Defining model with linear kernel.
-  logreg = linear_model.LogisticRegression(C=1e10, verbose=True)
+  logreg = linear_model.LogisticRegression(C=1e10)
+  ridge = Ridge(alpha=1.0)
   svr_rbf = SVR(kernel='rbf', C=1e3, gamma='auto', epsilon=0.1, verbose=True)
-  svr_lin = SVR(kernel='linear', C=1e3, epsilon=0.1, verbose=True, cache_size=7000, max_iter=10000)
-  svr_poly = SVR(kernel='poly', C=1e1, degree=10, max_iter=1000000, epsilon=0.4, verbose=True)
+  svr_lin = SVR(kernel='linear', C=1e1, epsilon=0.01, verbose=True, cache_size=7000)
+  svr_poly = SVR(kernel='poly', C=1e1, degree=10, epsilon=0.1, verbose=True, max_iter=10000)
   #print(np.shape(X))
-  #print(X)
+  print(X)
   logreg_model = logreg.fit(X,y)
+  print('Logistic Regression Training Complete.')
+  #ridge_model = ridge.fit(X,y)
+  print('Ridge Regression Training Complete.')
   svr_rbf_model = svr_rbf.fit(X,y)
+  print('SVR RBF Training Complete')
   svr_lin_model = svr_lin.fit(X,y)
+  print('SVR Linear Training Complete')
   svr_poly_model = svr_poly.fit(X,y)
+  print('SVR Polynomial Training Complete')
+  print(logreg_model.score(X,y))
+  #print(svr_rbf_model.score(X,y))
+  #print(svr_lin_model.score(X,y))
+  #print(svr_poly_model.score(X,y)
+  print('RBF, weights')
+  #print(svr_rbf_model.coef_)
+  #print(svr_rbf_model.intercept_)
+  print('Linear, weights')
+  print(svr_lin_model.coef_)
+  print(svr_lin_model.intercept_)
+  print('Polynomial, weights')
+  #print(svr_poly_model.coef_)
+  #print(svr_poly_model.intercept_)
   logreg_preds = logreg_model.predict(X)
   rbf_preds = svr_rbf_model.predict(X)
   lin_preds = svr_lin_model.predict(X)
@@ -136,6 +159,7 @@ def train_model(X, y):
 def test_model(X, y, model):
   p = model.predict(X)
   for i in range(len(y)):
+  
     print('Truth: ' + str(y[i]) + ', prediction: ' + str(p[i]))
   return p
 
@@ -158,18 +182,22 @@ def main(argv):
   xTrain, yTrain = separate_data(train_data)
   xTest, yTest = separate_data(test_data)
   preprocess(xTrain,yTrain)
+  preprocess(xTest,yTest)
   
 
   # Exploration section, plot various features against the to see what type of
   # feature scaling is appropriate.
   #explore_data(xTrain, yTrain)
+  print(xTest)
+  print(yTest)
  
   logreg_model, svr_rbf_model, svr_lin_model, svr_poly_model = train_model(xTrain,yTrain)
-  #results = test_model(xTest, yTest, svr_rbf_model)
+  results = test_model(xTest, yTest, svr_rbf_model)
   #results = test_model(xTest, yTest, svr_lin_model)
   #results = test_model(xTest, yTest, svr_poly_model)
-  results = test_model(xTest,yTest, logreg_model)
-  view_results(results)
+  #results = test_model(xTest,yTest, logreg_model)
+  #results = test_model(xTest,yTest, ridge_model)
+  #view_results(results)
   #reg = linear_model.Ridge (alpha = .5)
 
 
