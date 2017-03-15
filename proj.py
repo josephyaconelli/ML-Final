@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 from sklearn import linear_model
 from sklearn.svm import SVR
 from sklearn.linear_model import Ridge
+from sklearn.model_selection import GridSearchCV
 
 
 paramdict = {} #dictionary so we can print actual parameter titles, not abbreviations
@@ -44,9 +45,7 @@ def train_results(filename):
   f = open(filename, 'r')
   p = re.compile(',')
   for l in f:
-    #print l
     example = p.split(l.strip())
-    #print example[2]  #float form
     trainX.append(factdict.get(example[2][:-2]))
     trainY.append(example[4])
   return [(x,y) for x, y in zip(trainX,trainY)]
@@ -94,7 +93,6 @@ def preprocess(X,y):
   for i in range(len(X)):
     for j in range(len(X[i])):
       X[i][j] = (X[i][j] - mins[j])/(maxs[j] - mins[j])
-  #return X, y
     
   
 def explore_data(X,y):
@@ -103,13 +101,21 @@ def explore_data(X,y):
   # PSTPersons 65 years and over, percent
   print(' ')
 
-def train_model(X, y):
+def tune_params(X, y, model, tuned_params):
+  pass
+
+def train_model(X, y, models):
+  if('logistic_regression' in models):
+    logreg = linear_model.LogisticRegression(C=1e5)
+  
+
+def train_models(X, y):
   # Defining model with linear kernel.
   logreg = linear_model.LogisticRegression(C=1e10)
   ridge = Ridge(alpha=1.0)
   svr_rbf = SVR(kernel='rbf', C=1e3, gamma='auto', epsilon=0.1, verbose=True)
   svr_lin = SVR(kernel='linear', C=1e1, epsilon=0.01, verbose=True, cache_size=7000)
-  svr_poly = SVR(kernel='poly', C=1e1, degree=10, epsilon=0.1, verbose=True, max_iter=10000)
+  svr_poly = SVR(kernel='poly', C=1e2, degree=7, epsilon=0.005, verbose=True)
   #print(np.shape(X))
   print(X)
   logreg_model = logreg.fit(X,y)
@@ -144,10 +150,11 @@ def train_model(X, y):
   print(lin_preds)
   print(poly_preds)
   lw = 1
-  plt.scatter(range(0,len(y)),y, color='red', label='data')
+  plt.scatter(range(0,len(y)),y, color='red', label='Test Data')
   plt.hold('on')
   plt.plot(range(0,len(y)),rbf_preds, color='blue', lw=lw, label='RBF model')
   plt.plot(range(0,len(y)),lin_preds, color='green', lw=lw, label='Linear model')
+  plt.plot(range(0,len(y)),poly_preds, color='purple', lw=lw, label='Poly model')
   plt.xlabel('sample index')
   plt.ylabel('target')
   plt.title('Primary Training Data Support Vector Regression')
@@ -159,8 +166,16 @@ def train_model(X, y):
 def test_model(X, y, model):
   p = model.predict(X)
   for i in range(len(y)):
-  
     print('Truth: ' + str(y[i]) + ', prediction: ' + str(p[i]))
+  lw = 2
+  plt.scatter(range(0,len(y)),y,color='red',label='Test Data')
+  plt.hold('on')
+  plt.plot(range(0,len(y)),p,color='blue',lw=lw,label='Model Predictions')
+  plt.xlabel('Sample Index')
+  plt.ylabel('Target')
+  plt.title('Primary Test Data Predictions')
+  plt.legend()
+  plt.show()
   return p
 
 def view_results(results):
@@ -191,7 +206,7 @@ def main(argv):
   print(xTest)
   print(yTest)
  
-  logreg_model, svr_rbf_model, svr_lin_model, svr_poly_model = train_model(xTrain,yTrain)
+  logreg_model, svr_rbf_model, svr_lin_model, svr_poly_model = train_models(xTrain,yTrain)
   results = test_model(xTest, yTest, svr_rbf_model)
   #results = test_model(xTest, yTest, svr_lin_model)
   #results = test_model(xTest, yTest, svr_poly_model)
